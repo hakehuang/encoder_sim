@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2026 Hake Huang
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/*
+ * Pin map for Blue Pill / stm32_min_dev default (blue revision).
+ *
+ * Reserved and intentionally not used here:
+ * - PA9/PA10  : UART1 console shell
+ * - PA13/PA14 : SWD debug
+ * - PC13      : board LED
+ *
+ * Optional but used here:
+ * - PA11/PA12 : USB D-/D+ (channel 11). Leave ch11 disabled if USB is needed.
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	encoder_outputs {
+		compatible = "gpio-leds";
+
+		enc0a: enc0a {
+			gpios = <&gpioa 0 GPIO_ACTIVE_HIGH>;
+			label = "ENC0_A";
+		};
+		enc0b: enc0b {
+			gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>;
+			label = "ENC0_B";
+		};
+
+		enc1a: enc1a {
+			gpios = <&gpioa 2 GPIO_ACTIVE_HIGH>;
+			label = "ENC1_A";
+		};
+		enc1b: enc1b {
+			gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>;
+			label = "ENC1_B";
+		};
+
+		enc2a: enc2a {
+			gpios = <&gpioa 4 GPIO_ACTIVE_HIGH>;
+			label = "ENC2_A";
+		};
+		enc2b: enc2b {
+			gpios = <&gpioa 5 GPIO_ACTIVE_HIGH>;
+			label = "ENC2_B";
+		};
+
+		enc3a: enc3a {
+			gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>;
+			label = "ENC3_A";
+		};
+		enc3b: enc3b {
+			gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
+			label = "ENC3_B";
+		};
+
+		enc4a: enc4a {
+			gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
+			label = "ENC4_A";
+		};
+		enc4b: enc4b {
+			gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>;
+			label = "ENC4_B";
+		};
+
+		enc5a: enc5a {
+			gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>;
+			label = "ENC5_A";
+		};
+		enc5b: enc5b {
+			gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>;
+			label = "ENC5_B";
+		};
+
+		enc6a: enc6a {
+			gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
+			label = "ENC6_A";
+		};
+		enc6b: enc6b {
+			gpios = <&gpiob 7 GPIO_ACTIVE_HIGH>;
+			label = "ENC6_B";
+		};
+
+		enc7a: enc7a {
+			gpios = <&gpiob 8 GPIO_ACTIVE_HIGH>;
+			label = "ENC7_A";
+		};
+		enc7b: enc7b {
+			gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
+			label = "ENC7_B";
+		};
+
+		enc8a: enc8a {
+			gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
+			label = "ENC8_A";
+		};
+		enc8b: enc8b {
+			gpios = <&gpiob 11 GPIO_ACTIVE_HIGH>;
+			label = "ENC8_B";
+		};
+
+		enc9a: enc9a {
+			gpios = <&gpiob 12 GPIO_ACTIVE_HIGH>;
+			label = "ENC9_A";
+		};
+		enc9b: enc9b {
+			gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>;
+			label = "ENC9_B";
+		};
+
+		enc10a: enc10a {
+			gpios = <&gpiob 14 GPIO_ACTIVE_HIGH>;
+			label = "ENC10_A";
+		};
+		enc10b: enc10b {
+			gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>;
+			label = "ENC10_B";
+		};
+
+		enc11a: enc11a {
+			gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
+			label = "ENC11_A";
+		};
+		enc11b: enc11b {
+			gpios = <&gpioa 12 GPIO_ACTIVE_HIGH>;
+			label = "ENC11_B";
+		};
+	};
+
+	aliases {
+		enc0a = &enc0a;
+		enc0b = &enc0b;
+		enc1a = &enc1a;
+		enc1b = &enc1b;
+		enc2a = &enc2a;
+		enc2b = &enc2b;
+		enc3a = &enc3a;
+		enc3b = &enc3b;
+		enc4a = &enc4a;
+		enc4b = &enc4b;
+		enc5a = &enc5a;
+		enc5b = &enc5b;
+		enc6a = &enc6a;
+		enc6b = &enc6b;
+		enc7a = &enc7a;
+		enc7b = &enc7b;
+		enc8a = &enc8a;
+		enc8b = &enc8b;
+		enc9a = &enc9a;
+		enc9b = &enc9b;
+		enc10a = &enc10a;
+		enc10b = &enc10b;
+		enc11a = &enc11a;
+		enc11b = &enc11b;
+	};
+};
