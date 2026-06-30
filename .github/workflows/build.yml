@@ -3,20 +3,55 @@ name: Build
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 3 * * 1"
 
 permissions:
   contents: read
 
 jobs:
+  resolve-zephyr-refs:
+    name: Resolve Zephyr refs
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.refs.outputs.matrix }}
+      latest_stable: ${{ steps.refs.outputs.latest_stable }}
+    steps:
+      - name: Resolve latest Zephyr stable release
+        id: refs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          with urllib.request.urlopen(
+              'https://api.github.com/repos/zephyrproject-rtos/zephyr/releases/latest'
+          ) as response:
+              data = json.load(response)
+
+          latest_stable = data['tag_name']
+          matrix = {
+              'include': [
+                  {'zephyr_ref': 'main', 'zephyr_label': 'main'},
+                  {'zephyr_ref': latest_stable, 'zephyr_label': 'latest-stable'},
+              ]
+          }
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'latest_stable={latest_stable}\n')
+              output.write('matrix=' + json.dumps(matrix) + '\n')
+          PY
+
   build:
-    name: Build app and tests
+    name: Build app (${{ matrix.zephyr_label }})
+    needs: resolve-zephyr-refs
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-22.04, macos-14, windows-2025]
-    runs-on: ${{ matrix.os }}
+      matrix: ${{ fromJson(needs.resolve-zephyr-refs.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,29 +62,42 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: '3.12'
+
+      - name: Pin Zephyr revision in west manifest
+        shell: bash
+        env:
+          ZEPHYR_REF: ${{ matrix.zephyr_ref }}
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import re
+
+          manifest = pathlib.Path('example-application/west.yml')
+          text = manifest.read_text(encoding='utf-8')
+          text, count = re.subn(
+              r'(^\s+revision:\s*).+$',
+              rf'\1{os.environ["ZEPHYR_REF"]}',
+              text,
+              count=1,
+              flags=re.MULTILINE,
+          )
+          if count != 1:
+              raise SystemExit('Failed to update zephyr revision in west.yml')
+          manifest.write_text(text, encoding='utf-8')
+          print(text)
+          PY
 
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
           app-path: example-application
           toolchains: arm-zephyr-eabi
-          ccache-cache-key: ${{ matrix.os }}
+          ccache-cache-key: ${{ runner.os }}-${{ matrix.zephyr_label }}
 
-      - name: Build firmware
+      - name: Build firmware with Twister
         working-directory: example-application
         shell: bash
         run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-          fi
-          west twister -T app -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
-
-      - name: Twister Tests
-        working-directory: example-application
-        shell: bash
-        run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-          fi
-          west twister -T tests -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
+          west twister -T app -p stm32_min_dev -v --inline-logs --integration

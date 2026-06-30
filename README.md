@@ -83,3 +83,12 @@ enc disable 0
 - Channel 11 uses **PA11/PA12**. Leave it disabled if you need USB.
 - This is a **software-generated** waveform source, so maximum reliable rate
   depends on the number of active channels and system load.
+
+## CI
+
+GitHub Actions builds this application against:
+
+- Zephyr `main`
+- the latest Zephyr stable release tag, resolved dynamically at workflow runtime
+
+The workflow runs on push, pull request, manual dispatch, and a weekly schedule.
